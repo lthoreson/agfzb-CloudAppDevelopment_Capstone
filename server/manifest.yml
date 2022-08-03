@@ -1,11 +1,11 @@
   applications:
-  - name: djangoapp
+  - name: lthor
     routes:
-      - route: $HOST.$DOMAIN
+      - route: lthor.mybluemix.net
     memory: 128M
     buildpack: python_buildpack
-  - name: djangoapp-nginx
+  - name: lthor-nginx
     routes:
-      - route: $HOST.$DOMAIN/static
+      - route: lthor.mybluemix.net/static
     memory: 128M
     buildpack: staticfile_buildpack
