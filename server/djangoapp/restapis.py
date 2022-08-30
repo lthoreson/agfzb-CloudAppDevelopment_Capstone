@@ -1,20 +1,9 @@
 import requests
 import json
+from urllib.parse import quote
 # import related models here
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
-
-from ibm_watson import NaturalLanguageUnderstandingV1
-from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
-from ibm_watson.natural_language_understanding_v1 import Features, EntitiesOptions, KeywordsOptions
-
-authenticator = IAMAuthenticator('Vd89mL4t_oFxhaFQ5qZdj4Tnw5V4iGuv9FYof-0YGHQD')
-natural_language_understanding = NaturalLanguageUnderstandingV1(
-    version='2022-04-07',
-    authenticator=authenticator)
-
-natural_language_understanding.set_service_url('https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/5c87d02a-1457-498a-9e9d-04500830e216')
-
 
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
@@ -94,12 +83,10 @@ def get_dealer_reviews_from_cf(url, dealer_id):
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
-def analyze_review_sentiments(dealerreview):
-    response = natural_language_understanding.analyze(
-    text=dealerreview,
-    features=Features(
-        entities=EntitiesOptions(emotion=True, sentiment=True, limit=2),
-        keywords=KeywordsOptions(emotion=True, sentiment=True, limit=2))).get_result()
-    print(json.dumps(response, indent=2))
+def analyze_review_sentiments(dealer_review):
+    q_string = quote(dealer_review)
+    api_url = "https://fd03a7e3.us-south.apigw.appdomain.cloud/api/sentiment"
+    json_result = get_request(api_url, dealerreview=q_string)
+    return json_result["sentiment"]["document"]["label"]
 
 
