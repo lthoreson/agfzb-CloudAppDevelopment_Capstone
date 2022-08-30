@@ -4,6 +4,17 @@ import json
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
 
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson.natural_language_understanding_v1 import Features, EntitiesOptions, KeywordsOptions
+
+authenticator = IAMAuthenticator('Vd89mL4t_oFxhaFQ5qZdj4Tnw5V4iGuv9FYof-0YGHQD')
+natural_language_understanding = NaturalLanguageUnderstandingV1(
+    version='2022-04-07',
+    authenticator=authenticator)
+
+natural_language_understanding.set_service_url('https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/5c87d02a-1457-498a-9e9d-04500830e216')
+
 
 # Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
@@ -13,7 +24,7 @@ def get_request(url, **kwargs):
     print("GET from {} ".format(url))
     try:
         # Call get method of requests library with URL and parameters
-        if api_key:
+        if False:
             # Basic authentication GET
             response = requests.get(url, headers={'Content-Type': 'application/json'},
                                     params=kwargs, auth=HTTPBasicAuth('apikey', api_key))
@@ -74,7 +85,7 @@ def get_dealer_reviews_from_cf(url, dealer_id):
             review_obj = DealerReview(dealership=review["dealership"], name=review["name"], purchase=review["purchase"],
                                    review=review["review"], purchase_date=review["purchase_date"], car_make=review["car_make"],
                                    car_model=review["car_model"], id=review["id"],
-                                   car_year=review["car_year"], sentiment=review["sentiment"])
+                                   car_year=review["car_year"], sentiment=analyze_review_sentiments(review["review"]))
             results.append(review_obj)
 
     return results
@@ -83,6 +94,12 @@ def get_dealer_reviews_from_cf(url, dealer_id):
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
-
+def analyze_review_sentiments(dealerreview):
+    response = natural_language_understanding.analyze(
+    text=dealerreview,
+    features=Features(
+        entities=EntitiesOptions(emotion=True, sentiment=True, limit=2),
+        keywords=KeywordsOptions(emotion=True, sentiment=True, limit=2))).get_result()
+    print(json.dumps(response, indent=2))
 
 
