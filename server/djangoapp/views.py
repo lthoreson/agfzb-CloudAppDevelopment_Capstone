@@ -119,6 +119,12 @@ def get_dealer_details(request, dealer_id):
 
 
 # Create a `add_review` view to submit a review
-# def add_review(request, dealer_id):
+def add_review(request, dealer_id):
+    if request.COOKIES.get("sessionid") and request.method == "POST":
+        url = "https://fd03a7e3.us-south.apigw.appdomain.cloud/api/review"
+        review = {}
+        json_payload = {"review": review}
+        result = restapis.post_request(url, json_payload, dealerID=dealer_id)
+        return HttpResponse(result)
 # ...
 
