@@ -117,11 +117,15 @@ def get_dealer_details(request, dealer_id):
         reviews = restapis.get_dealer_reviews_from_cf(url, dealer_id)
         review_names = ' '.join([review.car_model for review in reviews])
         review_sentiment = ' '.join([review.sentiment for review in reviews])
-        return HttpResponse(review_sentiment)
+        context["reviews"] = reviews
+        return render(request, 'djangoapp/dealer_details.html', context)
 
 
 # Create a `add_review` view to submit a review
 def add_review(request, dealer_id):
+    context = {}
+    if request.method == 'GET':
+        return render(request, 'djangoapp/add_review.html', context)
     if request.COOKIES.get("sessionid") and request.method == "POST":
         url = "https://fd03a7e3.us-south.apigw.appdomain.cloud/api/review"
         review = {}
