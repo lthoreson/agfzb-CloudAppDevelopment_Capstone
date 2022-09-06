@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 # from .models import related models
+from .models import CarModel
 # from .restapis import related methods
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
@@ -118,19 +119,22 @@ def get_dealer_details(request, dealer_id):
         review_names = ' '.join([review.car_model for review in reviews])
         review_sentiment = ' '.join([review.sentiment for review in reviews])
         context["reviews"] = reviews
+        context["dealer_id"] = dealer_id
         return render(request, 'djangoapp/dealer_details.html', context)
 
 
 # Create a `add_review` view to submit a review
 def add_review(request, dealer_id):
     context = {}
+    context["dealer_id"] = dealer_id
     if request.method == 'GET':
+        context["cars"] = CarModel.objects.filter(dealer=dealer_id)
         return render(request, 'djangoapp/add_review.html', context)
     if request.COOKIES.get("sessionid") and request.method == "POST":
         url = "https://fd03a7e3.us-south.apigw.appdomain.cloud/api/review"
         review = {}
         json_payload = {"review": review}
         result = restapis.post_request(url, json_payload, dealerID=dealer_id)
-        return HttpResponse(result)
+        return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
 # ...
 
