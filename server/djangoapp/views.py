@@ -132,7 +132,24 @@ def add_review(request, dealer_id):
         return render(request, 'djangoapp/add_review.html', context)
     if request.COOKIES.get("sessionid") and request.method == "POST":
         url = "https://fd03a7e3.us-south.apigw.appdomain.cloud/api/review"
-        review = {}
+        car = CarModel.objects.get(id=request.POST['car'])
+        review = {
+            "purchase": request.POST['purchasecheck'],
+            "review": request.POST['content'],
+            "car_make": car.make.name,
+            "car_model": car.name,
+            "car_year": car.year,
+            "dealership": dealer_id,
+            "purchase_date": request.POST['purchasedate'],
+            "name": request.user.get_full_name(),
+            "id": 1
+        }
+        all_reviews = restapis.get_request(url)["rows"]
+        id_list = []
+        for one_review in all_reviews:
+            id_list.append(one_review["doc"]["id"])
+        while (review["id"] in id_list):
+            review["id"] += 1
         json_payload = {"review": review}
         result = restapis.post_request(url, json_payload, dealerID=dealer_id)
         return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
