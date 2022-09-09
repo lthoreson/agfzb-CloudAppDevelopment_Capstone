@@ -1,6 +1,4 @@
 requests
-python-dev
-python3-dev
 Django
 gunicorn==20.0.4
 Pillow==8.0.1
