@@ -78,7 +78,8 @@ def get_dealer_reviews_from_cf(url, dealer_id):
                                        car_model=review["car_model"], id=review["id"],
                                        car_year=review["car_year"], sentiment=analyze_review_sentiments(review["review"]))
                 results.append(review_obj)
-
+        except:
+            pass
     return results
 
 # Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
